@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "ChTest"
 include(":app")
-include(":utils")
+include(":ChTest")
