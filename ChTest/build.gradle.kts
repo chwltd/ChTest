@@ -1,7 +1,10 @@
 plugins {
     alias(libs.plugins.android.library)
-    id("maven-publish")
+    `maven-publish`
 }
+
+group = "com.github.chwltd"
+version = "v0.1.6"
 
 android {
     namespace = "com.chwltd.utils"
@@ -13,14 +16,9 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
-
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
         }
     }
     compileOptions {
@@ -36,4 +34,27 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+}
+
+publishing {
+    publications {
+        register<MavenPublication>("release") {
+            groupId = "com.github.chwltd"
+            artifactId = "ChTest"
+            version = "v0.1.6"
+
+            afterEvaluate {
+                from(components["release"])
+            }
+        }
+    }
+}
+
+tasks.register<Zip>("generateRepo") {
+    val publishTask = tasks.named(
+        "publishReleasePublicationToMyrepoRepository",
+        PublishToMavenRepository::class.java)
+    from(publishTask.map { it.repository.url })
+    into("ChTest")
+    archiveFileName.set("ChTest.zip")
 }
